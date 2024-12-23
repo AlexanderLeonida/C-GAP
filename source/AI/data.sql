@@ -1,0 +1,3 @@
+/*
+Will hold all data of database for AI 
+*/
