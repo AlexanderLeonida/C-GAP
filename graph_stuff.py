@@ -41,7 +41,7 @@ def generate_Single_Stock_Data_graph(ticker):
         for segment in line.get_lines():
             segment.set_alpha(0.6)  # Set the transparency for each line segment
 
-    plt.title(f'{ticker} - Price and Trades over Time')
+    plt.title(f'{ticker} - Price over Time')
     plt.xlabel('Time (Seconds)')
     plt.ylabel('Value')
     plt.legend()
