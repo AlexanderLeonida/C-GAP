@@ -1,0 +1,88 @@
+.container {
+    background-color: brown;
+    background-image: url('websitepfp.webp');
+    background-size: cover; 
+    background-repeat: repeat-y;
+    background-position: center; 
+    width: 100%;
+    text-align: center;
+    height: 2000px;
+    color: white;
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.homediv {
+    font-size: 40px;
+}
+
+#link {
+    color: lightblue;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+    font-family: 'Arial', sans-serif;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    table-layout: fixed; 
+}
+
+thead tr {
+    background-color: white;
+    color: black;
+    text-align: center;
+}
+
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd;
+}
+
+th {
+    position: sticky; 
+    top: 0; 
+    background-color: white; 
+    z-index: 2; 
+}
+
+tbody tr:hover {
+    /* https://coreui.io/blog/how-to-change-opacity-on-hover-in-css/#:~:text=To%20change%20the%20image%20opacity,placing%20their%20mouse%20over%20it. */
+    opacity: 0.5;
+}
+
+#notupdated {
+    color: red;
+}
+
+#updated {
+    /* manually entered */
+    color: #0bfc03;
+}
+
+#back-to-top {
+    position: fixed;
+    top: 5%;
+    left: 50%;
+    padding: 20px 20px;
+    background-color: maroon;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    display: none; /* only pops up when you scroll down */
+}
+
+#back-to-top:hover {
+    opacity: 80%;
+}
+
+#table-headers {
+    position: sticky;
+}

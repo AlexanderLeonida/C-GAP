@@ -1,6 +1,6 @@
 # Project User Manual
 
-Alex Leonida, Jacob Kong 
+Alex Leonida
 
 January 2024 - March 2025
 

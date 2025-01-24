@@ -1,6 +1,7 @@
 """
 Documentation:
 https://docs.kraken.com/api/docs/rest-api/get-asset-info
+using this to mess around with grabbing from the api
 """
 import requests
 
@@ -21,6 +22,8 @@ url = "https://api.kraken.com/0/public/Ticker"
 data = requests.request("GET", url, headers=headers, data=payload)
 tckerExists = False
 
+print(data.json()["result"].keys())
+
 #check to see if ticker is accesible by the database
 while tckerExists == False:
   #ticker of coin we're looking for
@@ -29,13 +32,7 @@ while tckerExists == False:
       tcker_data = data.json()["result"][tcker]
       tckerExists = True
   except:
-      print("That ticker symbol does not exist.")
-      print("Did you mean any of these?")
-      #sql stuff here
-      #TODO: WHERE tcker is in the name
-      #CHECK: From the original database, tcker:BTC should cover TBTCUSD, TBTCXBT, TBTCEUR, WBTCEUR, WBTCUSD, WBTCXBT, WBTCXBT
-
-
+     continue
 
 
 print("Searching for " + "'" + tcker + "'")

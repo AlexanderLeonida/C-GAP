@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/styles.css">
+    <title>Ticker Information</title>
+    <link rel="icon" type="image/webp" href="../static/websitepfp.webp">
+</head>
+<body class="container">
+    <h1>Enter Ticker Symbol</h1>
+    <h1 id="updated">(UPDATED)</h1>
+    <form method="POST" action="/get_ticker">
+        <label for="symbol">Ticker Symbol:</label>
+        <input type="text" id="symbol" name="symbol" required>
+        <button type="submit">Get Ticker Info</button>
+    </form>
+    {% if symbol %}
+        <h2>Ticker Information</h2>
+        <p><b>Symbol:</b> {{ symbol }}</p>
+        <p><b>Ask Price:</b> {{ ask_price }}</p>
+        <p><b>Bid Price:</b> {{ bid_price }}</p>
+        <p><b>Last Trade:</b> {{ last_trade }}</p>
+        <p><b>WVAP:</b> {{ wvap }}</p>
+        <p><b># trades last 24h:</b> {{ trades_24h }}</p>
+        <p><b>Day Low:</b> {{ day_low }}</p>
+        <p><b>Day High:</b> {{ day_high }}</p>
+        <p><b>Day Open:</b> {{ day_open }}</p>
+    {% endif %}
+
+    {% if error %}    
+        <b><p style="color: red;">{{ error }}</p></b>
+    {% endif %}
+
+    <nav>
+        <br><br>
+        <a id="link" href="/get_list">Get Full List of Tickers</a>
+    </nav>
+    <nav>
+        <br>
+        <a id="link" href="/">Go Home</a>
+    </nav>
+</body>
+</html>

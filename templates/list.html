@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Tickers</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" type="image/webp" href="../static/websitepfp.webp">
+</head>
+<body class="container">
+    <button id="back-to-top" onclick="scrollToTop()">Back to Top</button>
+    <div>
+        <h1>Available Ticker Information</h1>
+        <h1 id="notupdated">(NOT UPDATED)</h1>
+        <nav>
+            <a id="link" href="/get_ticker">Go Back</a>
+        </nav>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Symbol</th>
+                        <th>Ask Price</th>
+                        <th>Bid Price</th>
+                        <th>Last Trade</th>
+                        <th>WVAP</th>
+                        <th>24h Trades</th>
+                        <th>Day Low</th>
+                        <th>Day High</th>
+                        <th>Day Open</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticker in tickers %}
+                        <tr>
+                            <td>{{ ticker[0] }}</td>
+                            <td>{{ ticker[1] }}</td>
+                            <td>{{ ticker[2] }}</td>
+                            <td>{{ ticker[3] }}</td>
+                            <td>{{ ticker[4] }}</td>
+                            <td>{{ ticker[5] }}</td>
+                            <td>{{ ticker[6] }}</td>
+                            <td>{{ ticker[7] }}</td>
+                            <td>{{ ticker[8] }}</td>
+                            <td>{{ ticker[9] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+<script>
+    // back to top button functionality
+    window.onscroll = function() {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            document.getElementById("back-to-top").style.display = "block";
+        } else {
+            document.getElementById("back-to-top").style.display = "none";
+        }
+    };
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</html>
