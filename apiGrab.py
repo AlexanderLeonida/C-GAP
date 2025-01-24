@@ -96,3 +96,34 @@ def fetch_and_store_full_data(ticker):
         print(f"Error fetching data: {response.status_code}")
     
     return None
+
+def fetch_and_store_btc_data(ticker):
+    url = "https://api.kraken.com/0/public/Ticker"
+    headers = {'Accept': 'application/json'}
+    response = requests.get(url, headers=headers, params={'pair': ticker})
+    
+    if response.status_code == 200:
+        data = response.json().get("result", {}).get(ticker)
+        
+        if data:
+            # Insert the data into the BTC_Data table, including day_low and day_high
+            with conn.cursor() as cursor:
+                cursor.execute('''
+                    INSERT INTO BTC_Data (symbol, ask_price, bid_price, trades_24h, day_low, day_high)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                ''', (
+                    ticker,
+                    data['a'][0],  # ask price
+                    data['b'][0],  # bid price
+                    data['t'][1],  # trades in 24 hours
+                    data['l'][0],  # day low
+                    data['h'][0]   # day high
+                ))
+                conn.commit()
+            return True
+        else:
+            print(f"Data not found for {ticker}")
+            return False
+    else:
+        print(f"Error fetching data: {response.status_code}")
+        return False
