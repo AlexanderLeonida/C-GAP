@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify, render_template
 from data import conn, create_table, create_full_data_table, create_BTC_table
-from apiGrab import fetch_and_store_ticker_data, fetch_and_store_btc_data
+from api_grab import fetch_and_store_ticker_data, fetch_and_store_btc_data
 from fuzzywuzzy import process  # to guide users in finding a specific stock
 from apscheduler.schedulers.background import BackgroundScheduler #update btc database
 import atexit # delete btc database every time server closes
+from graph_stuff import generate_btc_data_graph
 
 
 app = Flask(__name__)
@@ -114,11 +115,23 @@ def view_full_data():
 
     return render_template('list.html', tickers=rows)
 
+# Function to render the BTC data graph
+@app.route('/btc_data_graph')
+def btc_data_graph():
+    # Generate the graph
+    img_base64 = generate_btc_data_graph()
+
+    # Render the template with the graph
+    return render_template('graph.html', graph_img=img_base64)
+
 if __name__ == '__main__':
     create_table()
     create_full_data_table()
-
+    # will be called every time the server is run
     create_BTC_table()
+    # updates btc every 60 seconds upon table creation
     scheduler = start_btc_data_scheduler()
+    # will delete the table after the server stops running for any reason
     atexit.register(delete_btc_data_table)
+
     app.run(debug=True, host='0.0.0.0', port=5000)
