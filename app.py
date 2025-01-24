@@ -3,6 +3,7 @@ from data import conn, create_table, create_full_data_table, create_BTC_table
 from apiGrab import fetch_and_store_ticker_data, fetch_and_store_btc_data
 from fuzzywuzzy import process  # to guide users in finding a specific stock
 from apscheduler.schedulers.background import BackgroundScheduler #update btc database
+import atexit # delete btc database every time server closes
 
 
 app = Flask(__name__)
@@ -54,11 +55,22 @@ def update_btc_data_periodically():
 # Function to start the background scheduler for periodic BTC data update
 def start_btc_data_scheduler():
     scheduler = BackgroundScheduler()
-
-    scheduler.add_job(update_btc_data_periodically, 'interval', seconds=30)
+    # The API updates every minute I think
+    scheduler.add_job(update_btc_data_periodically, 'interval', seconds=60)
 
     scheduler.start()
     return scheduler
+
+def delete_btc_data_table():
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DROP TABLE IF EXISTS BTC_Data')
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("BTC_Data table deleted successfully!")
+    except Exception as e:
+        print(f"Error deleting table: {e}")
 
 @app.route('/get_ticker', methods=['GET', 'POST'])
 def get_ticker():
@@ -105,6 +117,8 @@ def view_full_data():
 if __name__ == '__main__':
     create_table()
     create_full_data_table()
+
     create_BTC_table()
     scheduler = start_btc_data_scheduler()
+    atexit.register(delete_btc_data_table)
     app.run(debug=True, host='0.0.0.0', port=5000)
