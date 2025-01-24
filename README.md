@@ -1,7 +1,7 @@
 # Crypto GenAI Project
 **A Personal CS Quant Project**
 
-Alex Leonida, Jacob Kong 
+Alex Leonida
 
 January 2024 - March 2025
 
