@@ -24,7 +24,6 @@ def generate_btc_data_graph():
         print("Not enough data to generate the graph.")
         return None
 
-    # Prepare data for plotting
     ask_price = [row[0] for row in data]
     bid_price = [row[1] for row in data]
 
@@ -34,19 +33,21 @@ def generate_btc_data_graph():
 
     # Create a seaborn plot
     plt.figure(figsize=(10, 6))
-    sns.lineplot(data=ask_price, label='Ask Price', color='blue', alpha=0.4)
-    sns.lineplot(data=bid_price, label='Bid Price', color='red', alpha=0.4)
+    line1 = sns.lineplot(data=ask_price, label='Ask Price', color='blue')
+    line2 = sns.lineplot(data=bid_price, label='Bid Price', color='red')
 
     plt.title('BTC Data - Price and Trades over Time')
     plt.xlabel('Time (Seconds)')
     plt.ylabel('Value')
     plt.legend()
+    plt.tight_layout()
 
     # Set y-axis ticks to only show the last two values
-    y_ticks = sorted(set(last_ask_price + last_bid_price))  # Combine and deduplicate
+    y_ticks = sorted(set(last_ask_price + last_bid_price))
     plt.yticks(y_ticks)
 
     # Save the plot to a BytesIO object and then encode it to base64
+    # https://docs.python.org/3/library/base64.html
     img = io.BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
