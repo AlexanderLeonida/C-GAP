@@ -50,17 +50,16 @@ def create_full_data_table():
         conn.commit()
 
 # To track an individual stock and predict
-def create_BTC_table():
+def create_Single_Stock_table():
     with conn.cursor() as cursor:
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS BTC_Data (
+            CREATE TABLE IF NOT EXISTS Single_Stock_Data (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 symbol VARCHAR(200) NOT NULL,
                 ask_price VARCHAR(20),
                 bid_price VARCHAR(20),
-                trades_24h INT,
-                day_low VARCHAR(20),
-                day_high VARCHAR(20)
+                last_trade VARCHAR(20),
+                wvap VARCHAR(20)
             )
         ''')
         conn.commit()

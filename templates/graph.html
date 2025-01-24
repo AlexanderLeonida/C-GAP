@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/webp" href="../static/websitepfp.webp">
+    <title>Single Data Graph</title>
     <link rel="stylesheet" href="../static/styles.css">
-    <title>BTC Data Graph</title>
+    <link rel="icon" type="image/webp" href="../static/websitepfp.webp">
 </head>
 <body class="container">
-    <div>
-        <h1>BTC Data Graph</h1>
-        <img src="data:image/png;base64,{{ graph_img }}" alt="No BTC Graph Data Yet">
-    </div>
+    <h1>Generate A Single Stock's Data Graph</h1>
+    
+    <!-- Form to input ticker symbol -->
+    <form method="POST">
+        <label for="symbol">Enter Ticker Symbol:</label>
+        <input type="text" id="symbol" name="symbol" required>
+        <button type="submit">Generate Graph</button>
+    </form>
+    
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    
+    {% if graph_img %}
+    <h2>Graph for {{ symbol }}</h2>
+    <img src="data:image/png;base64,{{ graph_img }}" alt="Stock Graph">
+{% endif %}
 </body>
 </html>

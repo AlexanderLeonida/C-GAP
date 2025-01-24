@@ -9,15 +9,15 @@ from data import conn
 matplotlib.use('Agg')
 
 # Function to retrieve BTC data from the database
-def get_btc_data_from_db():
+def get_Single_Stock_Data_from_db(ticker):
     with conn.cursor() as cursor:
-        cursor.execute('SELECT ask_price, bid_price FROM BTC_Data WHERE symbol = "TBTCUSD"')
+        cursor.execute('SELECT ask_price, bid_price FROM Single_Stock_Data WHERE symbol = %s', (ticker,))
         return cursor.fetchall()  # Returns a list of tuples containing the data
 
 # Function to generate and return the graph as a base64-encoded string
-def generate_btc_data_graph():
-    # Retrieve data from the database
-    data = get_btc_data_from_db()
+def generate_Single_Stock_Data_graph(ticker):
+    # Retrieve data from the database for the specified ticker
+    data = get_Single_Stock_Data_from_db(ticker)
 
     # Check if there is enough data to plot
     if not data or len(data) < 2:
@@ -36,7 +36,12 @@ def generate_btc_data_graph():
     line1 = sns.lineplot(data=ask_price, label='Ask Price', color='blue')
     line2 = sns.lineplot(data=bid_price, label='Bid Price', color='red')
 
-    plt.title('BTC Data - Price and Trades over Time')
+    # Set the alpha (transparency) for the lines using the Line2D object
+    for line in [line1, line2]:
+        for segment in line.get_lines():
+            segment.set_alpha(0.6)  # Set the transparency for each line segment
+
+    plt.title(f'{ticker} - Price and Trades over Time')
     plt.xlabel('Time (Seconds)')
     plt.ylabel('Value')
     plt.legend()

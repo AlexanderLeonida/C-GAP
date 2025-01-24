@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, render_template
-from data import conn, create_table, create_full_data_table, create_BTC_table
-from api_grab import fetch_and_store_ticker_data, fetch_and_store_btc_data
+from data import conn, create_table, create_full_data_table, create_Single_Stock_table
+from api_grab import fetch_and_store_ticker_data, fetch_and_store_Single_Stock_Data
 from fuzzywuzzy import process  # to guide users in finding a specific stock
 from apscheduler.schedulers.background import BackgroundScheduler #update btc database
 import atexit # delete btc database every time server closes
-from graph_stuff import generate_btc_data_graph
+from graph_stuff import generate_Single_Stock_Data_graph
 
 
 app = Flask(__name__)
@@ -14,11 +14,16 @@ scheduler = BackgroundScheduler()
 def main():
     return render_template('home.html')
 
-# Function to retrieve ticker data from the database
 def get_ticker_from_db(symbol):
     with conn.cursor() as cursor:
-        cursor.execute('SELECT * FROM Ticker WHERE symbol = %s', (symbol,))
-        return cursor.fetchone()  # Returns None if ticker is not found
+        cursor.execute('SELECT * FROM Full_Data WHERE symbol = %s', (symbol,))
+        row = cursor.fetchone()
+        
+        # Debugging: Print the result from the query
+        print(f"Retrieved data for {symbol}: {row}")
+        
+        return row
+
 
 # Function to render the ticker data on the page
 def render_ticker_page(row):
@@ -48,28 +53,37 @@ def get_similar_tickers(symbol):
     similar_tickers = process.extract(symbol, available_tickers, limit=5)  # Get top 5 matches
     return [ticker[0] for ticker in similar_tickers]  # Return only the ticker symbols
 
-def update_btc_data_periodically():
-    valid_tickers = ['TBTCUSD']
-    for ticker in valid_tickers:
-        fetch_and_store_btc_data(ticker)
+# Update the ticker data periodically
+def update_Single_Stock_Data_periodically(symbol):
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT symbol FROM Full_Data WHERE symbol = %s', (symbol,))
+        ticker = cursor.fetchone()
+    if not ticker:
+        print(f"Ticker {symbol} not found in the database. Please add it first.")
+        return
+    print(f"Updating data for ticker: {symbol}")
+    fetch_and_store_Single_Stock_Data(symbol)
 
-# Function to start the background scheduler for periodic BTC data update
-def start_btc_data_scheduler():
-    scheduler = BackgroundScheduler()
-    # The API updates every minute I think
-    scheduler.add_job(update_btc_data_periodically, 'interval', seconds=60)
 
-    scheduler.start()
-    return scheduler
 
-def delete_btc_data_table():
+# # Start the background scheduler for a specific ticker
+# def start_Single_Stock_Data_scheduler(symbol):
+#     scheduler.add_job(
+#         func=lambda: update_Single_Stock_Data_periodically(symbol),
+#         trigger='interval',
+#         seconds=60,  # Update every 60 seconds
+#         id=f"update_{symbol}"
+#     )
+#     scheduler.start()
+
+
+# Delete the Single_Stock_Data table when the app stops
+def delete_Single_Stock_Data_table():
     try:
-        cursor = conn.cursor()
-        cursor.execute('DROP TABLE IF EXISTS BTC_Data')
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("BTC_Data table deleted successfully!")
+        with conn.cursor() as cursor:
+            cursor.execute('DROP TABLE IF EXISTS Single_Stock_Data')
+            conn.commit()
+        print("Single_Stock_Data table deleted successfully!")
     except Exception as e:
         print(f"Error deleting table: {e}")
 
@@ -115,23 +129,42 @@ def view_full_data():
 
     return render_template('list.html', tickers=rows)
 
-# Function to render the BTC data graph
-@app.route('/btc_data_graph')
-def btc_data_graph():
-    # Generate the graph
-    img_base64 = generate_btc_data_graph()
+@app.route('/Single_Stock_Data_graph', methods=['GET', 'POST'])
+def Single_Stock_Data_graph():
+    if request.method == 'POST':
+        symbol = request.form.get('symbol')
+        if not symbol:
+            return render_template('graph.html', error="No symbol entered")
+        
+        # Check if data exists in the database for the symbol
+        update_Single_Stock_Data_periodically(symbol)
+        update_Single_Stock_Data_periodically(symbol)
+        row = get_ticker_from_db(symbol)
+        if not row:
+            print(f"Ticker {symbol} not found. Adding to database...")
+            fetch_and_store_Single_Stock_Data(symbol)
+        
+        # Generate the graph
+        graph_img = generate_Single_Stock_Data_graph(symbol)
+        
+        if graph_img:
+            # Pass the generated image to the template
+            return render_template('graph.html', graph_img=graph_img, symbol=symbol)
+        else:
+            return render_template('graph.html', error=f"Not enough data to generate graph for {symbol}.")
+    
+    # GET request: render the graph input form
+    return render_template('graph.html')
 
-    # Render the template with the graph
-    return render_template('graph.html', graph_img=img_base64)
+
 
 if __name__ == '__main__':
     create_table()
     create_full_data_table()
     # will be called every time the server is run
-    create_BTC_table()
-    # updates btc every 60 seconds upon table creation
-    scheduler = start_btc_data_scheduler()
+    create_Single_Stock_table()
     # will delete the table after the server stops running for any reason
-    atexit.register(delete_btc_data_table)
+    atexit.register(delete_Single_Stock_Data_table)
+    # atexit.register(scheduler.shutdown)
 
     app.run(debug=True, host='0.0.0.0', port=5000)

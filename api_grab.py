@@ -41,7 +41,7 @@ def fetch_and_store_ticker_data(ticker):
                     data['a'][0],  # ask price
                     data['b'][0],  # bid price
                     data['c'][0],  # last trade
-                    data['p'][0],  # price
+                    data['p'][0],  # wvap
                     data['t'][1],  # number of trades in 24h
                     data['l'][0],  # day low
                     data['h'][0],  # day high
@@ -80,7 +80,7 @@ def fetch_and_store_full_data(ticker):
                         data['a'][0],  # ask price
                         data['b'][0],  # bid price
                         data['c'][0],  # last trade
-                        data['p'][0],  # price
+                        data['p'][0],  # wvap
                         data['t'][1],  # number of trades in 24h
                         data['l'][0],  # day low
                         data['h'][0],  # day high
@@ -97,7 +97,7 @@ def fetch_and_store_full_data(ticker):
     
     return None
 
-def fetch_and_store_btc_data(ticker):
+def fetch_and_store_Single_Stock_Data(ticker):
     url = "https://api.kraken.com/0/public/Ticker"
     headers = {'Accept': 'application/json'}
     response = requests.get(url, headers=headers, params={'pair': ticker})
@@ -108,23 +108,18 @@ def fetch_and_store_btc_data(ticker):
         if data:
             with conn.cursor() as cursor:
                 cursor.execute('''
-                    INSERT INTO BTC_Data (symbol, ask_price, bid_price, trades_24h, day_low, day_high)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    INSERT INTO Single_Stock_Data (symbol, ask_price, bid_price, last_trade, wvap)
+                    VALUES (%s, %s, %s, %s, %s)
                 ''', (
-                    ticker,
+                    ticker,                        
                     data['a'][0],  # ask price
                     data['b'][0],  # bid price
-                    data['t'][1],  # trades in 24 hours
-                    data['l'][0],  # day low
-                    data['h'][0]   # day high
+                    data['c'][0],  # last trade
+                    data['p'][0]   # wvap
                 ))
-                print('BTC data updated')
                 conn.commit()
-
-            return True
+                print(f"Data for {ticker} successfully stored in Single_Stock_Data.")
         else:
             print(f"Data not found for {ticker}")
-            return False
     else:
         print(f"Error fetching data: {response.status_code}")
-        return False
