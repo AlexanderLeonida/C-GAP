@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from data import conn, create_table, create_full_data_table, create_BTC_table
-from apiGrab import fetch_and_store_ticker_data
+from apiGrab import fetch_and_store_ticker_data, fetch_and_store_btc_data
 from fuzzywuzzy import process  # to guide users in finding a specific stock
+from apscheduler.schedulers.background import BackgroundScheduler #update btc database
+
 
 app = Flask(__name__)
+scheduler = BackgroundScheduler()
 
 @app.route('/')
 def main():
@@ -23,7 +26,6 @@ def render_ticker_page(row):
 
 # Function to handle fetching and storing ticker data if not found in the database
 def handle_new_ticker(symbol):
-    print(f"Attempting to fetch and store data for {symbol}...")
     ticker_data = fetch_and_store_ticker_data(symbol)
     
     if ticker_data:
@@ -43,6 +45,20 @@ def get_similar_tickers(symbol):
     # Use fuzzywuzzy to find close matches
     similar_tickers = process.extract(symbol, available_tickers, limit=5)  # Get top 5 matches
     return [ticker[0] for ticker in similar_tickers]  # Return only the ticker symbols
+
+def update_btc_data_periodically():
+    valid_tickers = ['TBTCUSD']
+    for ticker in valid_tickers:
+        fetch_and_store_btc_data(ticker)
+
+# Function to start the background scheduler for periodic BTC data update
+def start_btc_data_scheduler():
+    scheduler = BackgroundScheduler()
+
+    scheduler.add_job(update_btc_data_periodically, 'interval', seconds=30)
+
+    scheduler.start()
+    return scheduler
 
 @app.route('/get_ticker', methods=['GET', 'POST'])
 def get_ticker():
@@ -90,4 +106,5 @@ if __name__ == '__main__':
     create_table()
     create_full_data_table()
     create_BTC_table()
+    scheduler = start_btc_data_scheduler()
     app.run(debug=True, host='0.0.0.0', port=5000)

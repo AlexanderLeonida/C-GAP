@@ -54,7 +54,8 @@ def create_BTC_table():
     with conn.cursor() as cursor:
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS BTC_Data (
-                symbol VARCHAR(200) PRIMARY KEY NOT NULL,
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                symbol VARCHAR(200) NOT NULL,
                 ask_price VARCHAR(20),
                 bid_price VARCHAR(20),
                 trades_24h INT,

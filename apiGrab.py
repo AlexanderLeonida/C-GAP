@@ -106,7 +106,6 @@ def fetch_and_store_btc_data(ticker):
         data = response.json().get("result", {}).get(ticker)
         
         if data:
-            # Insert the data into the BTC_Data table, including day_low and day_high
             with conn.cursor() as cursor:
                 cursor.execute('''
                     INSERT INTO BTC_Data (symbol, ask_price, bid_price, trades_24h, day_low, day_high)
@@ -119,7 +118,9 @@ def fetch_and_store_btc_data(ticker):
                     data['l'][0],  # day low
                     data['h'][0]   # day high
                 ))
+                print('BTC data updated')
                 conn.commit()
+
             return True
         else:
             print(f"Data not found for {ticker}")
